@@ -1,13 +1,4 @@
 ---
-- name: Get consul server IPs
-  hosts: localhost
-  connection: local
-  gather_facts: no
-  become: no
-  tasks:
-    - debug:
-        var: groups['consul-server']
-
 - name: Install consul client
   hosts: consul-client
   gather_facts: yes
@@ -17,6 +8,10 @@
     consul_domain: fabos
     consul_servers_list: "{{ groups['consul-server'] | map('extract', hostvars, ['ansible_host']) }}"
   tasks:
+    - name: include vars
+      ansible.builtin.include_vars:
+        file: vars.yml
+
     - name: Include install task file
       ansible.builtin.include_role:
         name: consul
