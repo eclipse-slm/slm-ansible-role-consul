@@ -1,0 +1,45 @@
+---
+- name: Import prepare of install-default
+  ansible.builtin.import_playbook: ../default-install/prepare.yml
+
+- name: Add node via server's REST API
+  hosts: consul-server
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: include vars
+      ansible.builtin.include_vars:
+        file: ../default-install/vars.yml
+
+
+    - name: PUT /catalog/register - Node
+      ansible.builtin.uri:
+        url: "http://{{ ansible_host }}:8500/v1/catalog/register"
+        method: PUT
+        body_format: json
+        body:
+          ID: "{{ consul_client_node_id }}"
+          Node: "{{ consul_client_node_name }}"
+          Datacenter: "fabos"
+          Address: "{{ hostvars[groups['consul-client'] | first].ansible_host }}"
+
+
+    - name: PUT /catalog/register - Service
+      ansible.builtin.uri:
+        url: "http://{{ ansible_host }}:8500/v1/catalog/register"
+        method: PUT
+        body_format: json
+        body:
+          Node: "{{ consul_client_node_name }}"
+          Address: "{{ hostvars[groups['consul-client'] | first].ansible_host }}"
+          SkipNodeUpdate: true
+          Service:
+            ID: "bf2e3584-1aa0-4940-bb79-890c8b918840"
+            Service: "Test-Service"
+            Tags:
+              - tag1
+              - tag2
+              - tag3
+            Meta:
+              key1: value1
+              key2: value2

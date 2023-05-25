@@ -1,0 +1,41 @@
+---
+- name: Add node via server's REST API
+  hosts: consul-client
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: include vars
+      ansible.builtin.include_vars:
+        file: ../default-install/vars.yml
+
+    - name: PUT /catalog/register - Test-Service-1
+      ansible.builtin.uri:
+        url: "http://{{ ansible_host }}:8500/v1/agent/service/register"
+        method: PUT
+        body_format: json
+        body:
+          ID: "bf2e3584-1aa0-4940-bb79-890c8b918840"
+          Name: "Test-Service-1"
+          Tags:
+            - tag1
+            - tag2
+            - tag3
+          Meta:
+            key1: value1
+            key2: value2
+
+    - name: PUT /catalog/register - Test-Service-2
+      ansible.builtin.uri:
+        url: "http://{{ ansible_host }}:8500/v1/agent/service/register"
+        method: PUT
+        body_format: json
+        body:
+          ID: "76ee50c2-1bdb-403d-b07c-3d1bc04b38f1"
+          Name: "Test-Service-2"
+          Tags:
+            - tag1
+            - tag2
+            - tag3
+          Meta:
+            key1: value1
+            key2: value2
