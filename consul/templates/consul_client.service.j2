@@ -1,0 +1,11 @@
+[Unit]
+Description=Consul Client
+After=network-online.target
+
+[Service]
+User={{ consul_client_user }}
+WorkingDirectory={{ consul_client_directory }}
+ExecStart={{ consul_client_directory }}/{{ consul_client_binary }} agent -config-dir={{ consul_client_config_dir }} -data-dir={{ consul_client_data_dir }}
+
+[Install]
+WantedBy=default.target

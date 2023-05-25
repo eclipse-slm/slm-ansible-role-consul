@@ -1,0 +1,7 @@
+---
+- name: Assert install parameter
+  ansible.builtin.assert:
+    that:
+      - consul_datacenter is defined and consul_datacenter | length > 0
+      - consul_domain is defined and consul_domain | length > 0
+      - consul_servers_list is defined and consul_servers_list | length > 0

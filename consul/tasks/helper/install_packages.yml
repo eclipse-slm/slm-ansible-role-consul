@@ -1,0 +1,9 @@
+---
+- name: Install unzip - Ubuntu
+  ansible.builtin.apt:
+    name:
+      - unzip
+    state: present
+    update_cache: yes
+    autoremove: yes
+  when: ansible_distribution == 'Ubuntu'

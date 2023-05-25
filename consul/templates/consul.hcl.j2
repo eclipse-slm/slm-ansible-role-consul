@@ -1,0 +1,28 @@
+#####################################################################
+### Main and common consul configuration (for servers and agents) ###
+#####################################################################
+
+datacenter = "{{ consul_datacenter }}"
+domain = ".{{ consul_domain }}"
+server = false
+ui_config {
+  enabled = true
+}
+client_addr = "{{ ansible_default_ipv4.address }}"
+
+retry_join = {{ consul_servers_list | to_json }}
+retry_interval = "30s"
+retry_max = 0
+
+verify_incoming = false
+verify_outgoing = false
+verify_server_hostname = false
+
+# setup acl settings
+acl = {
+  enabled = true
+  default_policy = "allow"
+  enable_token_persistence = true
+}
+
+enable_script_checks = true

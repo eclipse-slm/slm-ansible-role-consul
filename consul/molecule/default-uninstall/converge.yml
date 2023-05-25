@@ -1,0 +1,11 @@
+---
+- name: Uninstall consul client
+  hosts: consul-client
+  gather_facts: yes
+  become: yes
+  vars:
+    state: absent
+  tasks:
+    - name: Include uninstall task file
+      ansible.builtin.include_role:
+        name: consul

@@ -1,0 +1,9 @@
+---
+# tasks file for consul
+- name: Install consul_client on target host
+  ansible.builtin.include_tasks: install.yml
+  when: state | default("present") == "present"
+
+- name: Uninstall consul_client on target host
+  ansible.builtin.include_tasks: uninstall.yml
+  when:  state | default("present") == "absent"

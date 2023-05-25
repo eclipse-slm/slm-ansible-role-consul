@@ -1,0 +1,44 @@
+---
+- name: "Gracefully leave"
+  ansible.builtin.uri:
+    url: "http://{{ ansible_host }}:8500/v1/agent/leave"
+    method: PUT
+    status_code: [200, -1]
+  register: leave_result
+  changed_when: leave_result.status == 200
+
+- name: Check if service file exists
+  ansible.builtin.stat:
+    path: "/etc/systemd/system/{{ consul_client_service_name }}.service"
+  register: service_file
+
+- name: "Stop consul_client service"
+  ansible.builtin.systemd:
+    state: stopped
+    daemon_reload: yes
+    name: "{{ consul_client_service_name }}"
+  when: service_file.stat.exists
+
+- name: "Remove service file"
+  ansible.builtin.file:
+    dest: "/etc/systemd/system/{{ consul_client_service_name }}.service"
+    state: absent
+    force: yes
+
+- name: "Reload systemctl daemon"
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: "Remove folder"
+  ansible.builtin.file:
+    dest: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ consul_download_folder }}"
+    - "{{ consul_client_directory }}"
+    - "{{ consul_client_config_dir }}"
+
+- name: "Ensure consul user is removed"
+  ansible.builtin.user:
+    name: "{{ consul_client_user }}"
+    state: absent

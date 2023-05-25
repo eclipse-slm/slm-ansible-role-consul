@@ -1,0 +1,70 @@
+---
+- name: Assert Input params
+  ansible.builtin.include_tasks: helper/assert_install_params.yml
+
+- name: Install packages
+  ansible.builtin.include_tasks: helper/install_packages.yml
+
+- name: "Ensure consul user exists"
+  ansible.builtin.user:
+    name: "{{ consul_client_user }}"
+
+- name: "Create folder"
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    owner: "{{ item.owner }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - path: "{{ consul_download_folder }}"
+      owner: root
+    - path: "{{ consul_client_directory }}"
+      owner: "{{ consul_client_user }}"
+    - path: "{{ consul_client_config_dir }}"
+      owner: "{{ consul_client_user }}"
+    - path: "{{ consul_client_data_dir }}"
+      owner: "{{ consul_client_user }}"
+
+- name: "Ensure consul common configuration 'consul.hcl' is deployed"
+  ansible.builtin.template:
+    src: "consul.hcl.j2"
+    dest: "{{ consul_client_config_dir }}/consul.hcl"
+    owner: "{{ consul_client_user }}"
+    mode: "0640"
+
+- name: "Check download file"
+  ansible.builtin.stat:
+    path: "{{ consul_download_folder }}/{{consul_download_filename}}"
+  register: stat_download_file
+
+- name: "Download consul in version {{ consul_version }}"
+  ansible.builtin.get_url:
+    url: "{{ consul_download_url }}"
+    dest: "{{ consul_download_folder }}/{{consul_download_filename}}"
+  when: stat_download_file.stat.exists == false
+
+- name: "Unpack download files"
+  ansible.builtin.unarchive:
+    src: "{{ consul_download_folder }}/{{consul_download_filename}}"
+    dest: "{{ consul_download_folder }}"
+    remote_src: true
+
+- name: Copy consul binary
+  ansible.builtin.copy:
+    src: "{{ consul_download_folder }}/consul"
+    dest: "{{ consul_client_directory }}/{{ consul_client_binary }}"
+    owner: "{{ consul_client_user }}"
+    mode: '0744'
+    remote_src: true
+
+- name: "Copy service file"
+  ansible.builtin.template:
+    src: consul_client.service.j2
+    dest: "/etc/systemd/system/{{ consul_client_service_name }}.service"
+    force: yes
+
+- name: "Start consul_client service"
+  ansible.builtin.systemd:
+    state: started
+    daemon_reload: yes
+    name: "{{ consul_client_service_name }}"

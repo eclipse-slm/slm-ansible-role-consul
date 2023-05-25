@@ -1,0 +1,5 @@
+- name: Include prepare of "install"
+  ansible.builtin.import_playbook: ../default-install/prepare.yml
+
+- name: Include converge of "install"
+  ansible.builtin.import_playbook: ../default-install/converge.yml

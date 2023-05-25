@@ -1,0 +1,23 @@
+- name: Verify - install (client)
+  hosts: consul-client
+  gather_facts: no
+  become: no
+  tasks:
+    - name: Send GET request to consul_client endpoint
+      ansible.builtin.uri:
+        url: "http://{{ansible_host}}:8500/"
+
+- name: Verify - install (server)
+  hosts: consul-server
+  gather_facts: no
+  become: no
+  tasks:
+    - name: Send GET request to consul_server /catalog/nodes endpoint
+      ansible.builtin.uri:
+        url: "http://{{ansible_host}}:8500/v1/catalog/nodes"
+      register: nodes_response
+
+    - name: Assert nodes is size == 2
+      ansible.builtin.assert:
+        that:
+          - nodes_response.json | length == 2
