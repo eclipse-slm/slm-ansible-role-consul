@@ -4,12 +4,6 @@
   become: yes
   gather_facts: yes
   tasks:
-    - debug:
-        var: ansible_distribution
-
-    - debug:
-        var: ansible_distribution_major_version
-
     - name: Get Consul Server IP
       ansible.builtin.set_fact:
         consul_server_address: "{{ hostvars[groups['consul-server'] | first].ansible_host }}"
