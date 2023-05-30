@@ -11,7 +11,7 @@
     - name: "Start consul-server via Docker Compose"
       community.docker.docker_compose:
         state: "present"
-        project_name: "nodered"
+        project_name: "consul-server"
         definition: "{{ lookup('template', './docker-compose-consul-server.yml.j2') | from_yaml }}"
       register: docker_compose
       retries: 5
