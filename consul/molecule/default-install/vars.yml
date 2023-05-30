@@ -1,3 +1,4 @@
 ---
+consul_datacenter:        fabos
 consul_client_node_name:  test-host
 consul_client_node_id:    04498d87-e3ca-4569-826b-6ebbfaaad066
