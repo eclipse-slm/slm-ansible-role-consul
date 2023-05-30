@@ -6,7 +6,7 @@
   vars:
     consul_datacenter: fabos
     consul_domain: fabos
-    consul_servers_list: "{{ groups['consul-server'] | map('extract', hostvars, ['ansible_host']) }}"
+    consul_servers_list: "{{ groups['consul-server'] | map('extract', hostvars, ['ansible_host']) + ['192.168.1.1'] }}"
   tasks:
     - name: include vars
       ansible.builtin.include_vars:
