@@ -1,0 +1,31 @@
+---
+- name: Get Consul Server IP
+  ansible.builtin.set_fact:
+    consul_server_address: "{{ hostvars[groups['consul-server'] | first].ansible_host }}"
+
+- name: PUT /catalog/register - Node
+  ansible.builtin.uri:
+    url: "http://{{ consul_server_address }}:8500/v1/catalog/register"
+    method: PUT
+    body_format: json
+    body: "{{ backup_node }}"
+
+- name: PUT /catalog/register - Service
+  ansible.builtin.uri:
+    url: "http://{{ consul_server_address }}:8500/v1/catalog/register"
+    method: PUT
+    body_format: json
+    body:
+      Node: "{{ backup_node.Node }}"
+      Address: "{{ backup_node.Address }}"
+      SkipNodeUpdate: true
+      Service:
+        ID: "{{ item.value.ID }}"
+        Service: "{{ item.value.Service }}"
+        Tags: "{{ item.value.Tags }}"
+        Meta: "{{ item.value.Meta }}"
+        # Port: "{{ item.value.Port }}"
+        # Weights: "{{ item.value.Weights }}"
+  loop: "{{ backup_services | dict2items }}"
+
+

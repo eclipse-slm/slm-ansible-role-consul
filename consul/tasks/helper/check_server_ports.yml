@@ -1,0 +1,36 @@
+---
+- name: Check Server IP is defined
+  ansible.builtin.assert:
+    that: server_ip is defined
+
+- debug:
+    msg: "Check availability of {{ server_ip }}"
+
+- name: Init availability result
+  ansible.builtin.set_fact:
+    is_server_available: false
+
+- name: Check availability of ports
+  ansible.builtin.wait_for:
+    host: "{{ server_ip }}"
+    port: "{{ port }}"
+    state: started
+    delay: 0
+    timeout: 3
+  ignore_errors: yes
+  loop:
+    - 8300
+    - 8500
+  loop_control:
+    loop_var: port
+  register: wait_for_port
+
+# If one wait_for fails => connectivity to server is not possible
+- name: Save result of availability
+  ansible.builtin.set_fact:
+    availability: "{{ (true in ( wait_for_port | json_query('results[*].failed') )) == false }}"
+
+# server_availability: key = server_ip, value = availability of server
+- name: Add result to server availability
+  ansible.builtin.set_fact:
+    server_availability: "{{ server_availability | combine({server_ip: availability}) }}"

@@ -1,0 +1,35 @@
+---
+- name: GET /agent/services
+  ansible.builtin.uri:
+    url: "http://{{ ansible_host }}:8500/v1/agent/services"
+    method: GET
+  register: get_services
+
+- name: Save Agent's services
+  ansible.builtin.set_fact:
+    backup_services: "{{ get_services.json }}"
+
+- debug:
+    var: backup_services
+
+- name: GET /agent/self
+  ansible.builtin.uri:
+    url: "http://{{ ansible_host }}:8500/v1/agent/self"
+    method: GET
+  register: get_self
+
+- name: Save Agent's self info
+  ansible.builtin.set_fact:
+    agent_self_info: "{{ get_self.json }}"
+
+- name: Save Agent's node info
+  ansible.builtin.set_fact:
+    backup_node:
+      ID: "{{ agent_self_info.Config.NodeID }}"
+      Node: "{{ agent_self_info.Config.NodeName }}"
+      Address: "{{ agent_self_info.Member.Addr }}"
+      Datacenter: "{{ agent_self_info.Config.PrimaryDatacenter }}"
+      NodeMeta: "{{ agent_self_info.Meta }}"
+
+- debug:
+    var: backup_node

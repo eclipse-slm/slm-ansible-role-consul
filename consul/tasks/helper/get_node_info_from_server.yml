@@ -1,0 +1,10 @@
+---
+- name: GET /catalog/node
+  ansible.builtin.uri:
+    url: "http://{{ consul_servers_list | first }}:8500/v1/catalog/node/{{ consul_client_node_name }}"
+    method: GET
+  register: get_node_services
+
+- name: Save services for restore
+  ansible.builtin.set_fact:
+    services_backup: "{{ get_node_services.json.Services | default({}) }}"

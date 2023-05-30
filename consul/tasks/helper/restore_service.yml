@@ -1,0 +1,26 @@
+---
+- debug:
+    var: service
+
+- name: Set request body
+  ansible.builtin.set_fact:
+    body:
+      ID: "{{ service.ID }}"
+      Name: "{{ service.Service }}"
+      Tags: "{{ service.Tags | default([]) }}"
+      Address: "{{ ansible_host }}"
+      Meta: "{{ service.Meta | default({}) }}"
+      Weights: "{{ service.Weights }}"
+
+- name: Add Port to body if available
+  ansible.builtin.set_fact:
+    body: "{{ body | combine({ 'Port': service.Port }) }}"
+  when: service.Port is defined
+
+- name: "PUT /agent/service/register - Service '{{service.Service}}'"
+  ansible.builtin.uri:
+    url: "http://{{ ansible_host }}:8500/v1/agent/service/register"
+    method: PUT
+    body_format: json
+    body: "{{ body }}"
+
