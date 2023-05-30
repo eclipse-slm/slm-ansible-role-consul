@@ -68,3 +68,13 @@
     state: started
     daemon_reload: yes
     name: "{{ consul_client_service_name }}"
+  register: start_service
+
+- name: Restore service backups
+  ansible.builtin.include_tasks: helper/restore_service.yml
+  loop: "{{ services_backup | dict2items }}"
+  vars:
+    service: "{{ item.value }}"
+  when:
+    - start_service.changed
+    - consul_client_restore_services | default(true)
