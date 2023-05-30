@@ -6,6 +6,7 @@
     status_code: [200, -1]
   register: leave_result
   changed_when: leave_result.status == 200
+  when: consul_client_leave | default(false)
 
 - name: Check if service file exists
   ansible.builtin.stat:
