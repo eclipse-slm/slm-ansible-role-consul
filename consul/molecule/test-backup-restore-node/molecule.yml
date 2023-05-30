@@ -1,0 +1,22 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: delegated
+platforms:
+  - name: ubuntu2204-consul-client
+    template_name: ubuntu-22-04
+    groups: ['ssh', 'consul-client']
+  - name: ubuntu2204-consul-server
+    template_name: ubuntu-22-04-docker
+    groups: ['ssh', 'consul-server']
+provisioner:
+  name: ansible
+  playbooks:
+    create: ../default/create.yml
+    destroy: ../default/destroy.yml
+    prepare: prepare.yml
+    converge: ../default-install/converge.yml
+    verify: verify.yml
+verifier:
+  name: ansible

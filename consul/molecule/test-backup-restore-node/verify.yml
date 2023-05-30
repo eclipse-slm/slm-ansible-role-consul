@@ -1,0 +1,16 @@
+---
+- name: Assert Services are available after consul client install
+  hosts: consul-client
+  tasks:
+    - name: include vars
+      ansible.builtin.include_vars:
+        file: "test_var.yml"
+
+    - name: GET /agent/services
+      ansible.builtin.uri:
+        url: "http://{{ ansible_host }}:8500/v1/agent/services"
+        method: GET
+      register: get_services
+
+    - assert:
+        that: get_services.json | length == consul_services | length

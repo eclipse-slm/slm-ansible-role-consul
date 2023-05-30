@@ -1,0 +1,23 @@
+- name: Verify - install (client)
+  hosts: consul-client
+  gather_facts: no
+  become: no
+  tasks:
+    - name: include vars
+      ansible.builtin.include_vars:
+        file: "test_var.yml"
+
+    - name: Get stat of consul_client service file
+      ansible.builtin.stat:
+        path: /etc/systemd/system/consul_client.service
+      register: consul_client_service_file
+
+    - name: Check consul_client service file is not available
+      ansible.builtin.assert:
+        that: consul_client_service_file.stat.exists == false
+      when: consul_client_force_install == false
+
+    - name: Check consul_client service file is available
+      ansible.builtin.assert:
+        that: consul_client_service_file.stat.exists == true
+      when: consul_client_force_install == true

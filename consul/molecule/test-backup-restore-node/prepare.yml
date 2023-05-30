@@ -1,0 +1,38 @@
+---
+- name: Include prepare of default-install
+  ansible.builtin.import_playbook: ../default-install/prepare.yml
+
+- name: Create node and services via Server REST API
+  hosts: consul-server
+  tasks:
+    - name: include vars
+      ansible.builtin.include_vars:
+        file: "{{ item }}"
+      loop:
+        - ../default-install/vars.yml
+        - test_var.yml
+
+
+    - name: PUT /catalog/register - Node
+      ansible.builtin.uri:
+        url: "http://{{ ansible_host }}:8500/v1/catalog/register"
+        method: PUT
+        body_format: json
+        body:
+          ID: "{{ consul_client_node_id }}"
+          Node: "{{ consul_client_node_name }}"
+          Datacenter: "{{ consul_datacenter }}"
+          Address: "{{ hostvars[groups['consul-client'] | first].ansible_host }}"
+
+
+    - name: PUT /catalog/register - Service
+      ansible.builtin.uri:
+        url: "http://{{ ansible_host }}:8500/v1/catalog/register"
+        method: PUT
+        body_format: json
+        body:
+          Node: "{{ consul_client_node_name }}"
+          Address: "{{ hostvars[groups['consul-client'] | first].ansible_host }}"
+          SkipNodeUpdate: true
+          Service: "{{item}}"
+      loop: "{{ consul_services }}"

@@ -1,0 +1,81 @@
+---
+- name: Assert Services are available after consul client uninstall
+  hosts: consul-server
+  vars:
+    consul_node_name: test-host
+  tasks:
+    - name: include vars
+      ansible.builtin.include_vars:
+        file: "test_var.yml"
+
+    - name: GET /catalog/node/:node-name
+      ansible.builtin.uri:
+        url: "http://{{ ansible_host }}:8500/v1/catalog/node/{{ consul_node_name }}"
+        method: GET
+      register: get_node
+
+    - name: Assert Node and Service Info are available
+      ansible.builtin.assert:
+        that:
+          - get_node.json.Node is defined
+          - get_node.json.Services is defined
+          - get_node.json.Services | length >= consul_services | length
+
+- name: Test new services can be registered via Server API
+  hosts: consul-server
+  vars:
+    consul_node_name: test-host
+    consul_datacenter: fabos
+  tasks:
+    - name: include vars
+      ansible.builtin.include_vars:
+        file: "test_var.yml"
+
+    - name: GET /catalog/node/:node-name
+      ansible.builtin.uri:
+        url: "http://{{ ansible_host }}:8500/v1/catalog/node/{{ consul_node_name }}"
+        method: GET
+      register: get_node
+
+    - name: PUT /catalog/register - Service
+      ansible.builtin.uri:
+        url: "http://{{ ansible_host }}:8500/v1/catalog/register"
+        method: PUT
+        body_format: json
+        body:
+          Node: "{{ consul_node_name }}"
+          Address: "{{ hostvars[groups['consul-client'] | first].ansible_host }}"
+          SkipNodeUpdate: true
+          Service: "{{item}}"
+      loop: "{{ consul_verify_services }}"
+
+    - name: GET /catalog/node/:node-name
+      ansible.builtin.uri:
+        url: "http://{{ ansible_host }}:8500/v1/catalog/node/{{ consul_node_name }}"
+        method: GET
+      register: get_node
+
+    - name: Assert Verify Service is added
+      ansible.builtin.assert:
+        that:
+          - get_node.json.Services | length == (consul_services | length) + (consul_verify_services | length)
+
+
+    - name: PUT /catalog/deregister - Node
+      ansible.builtin.uri:
+        url: "http://{{ ansible_host }}:8500/v1/catalog/deregister"
+        method: PUT
+        body_format: json
+        body:
+          Node: "{{ consul_node_name }}"
+          Datacenter: "{{ consul_datacenter }}"
+
+    - name: GET /catalog/node/:node-name
+      ansible.builtin.uri:
+        url: "http://{{ ansible_host }}:8500/v1/catalog/node/{{ consul_node_name }}"
+        method: GET
+      register: get_node
+
+    - name: Assert node is not available
+      ansible.builtin.assert:
+        that: get_node.json == None

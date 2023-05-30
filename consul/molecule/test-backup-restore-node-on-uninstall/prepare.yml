@@ -1,0 +1,28 @@
+---
+- name: Include prepare of default-install
+  ansible.builtin.import_playbook: ../default-uninstall/prepare.yml
+
+- name: Create Services via Agent's REST API
+  hosts: consul-client
+  tasks:
+    - name: include vars
+      ansible.builtin.include_vars:
+        file: "{{ item }}"
+      loop:
+        - ../default-install/vars.yml
+        - test_var.yml
+
+    - name: PUT /catalog/register - Service
+      ansible.builtin.uri:
+        url: "http://{{ ansible_host }}:8500/v1/agent/service/register"
+        method: PUT
+        body_format: json
+        body: >
+          {
+            "ID": "{{ item.ID }}",
+            "Name": "{{ item.Service }}",
+            "Port": {{ item.Port | default(0) }},
+            "Tags": {{ item.Tags | to_nice_json }},
+            "Meta": {{ item.Meta | to_nice_json }}
+          }
+      loop: "{{ consul_services }}"

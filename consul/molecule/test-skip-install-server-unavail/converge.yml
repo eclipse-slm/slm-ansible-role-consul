@@ -1,0 +1,21 @@
+---
+- name: Install consul client
+  hosts: consul-client
+  gather_facts: yes
+  become: yes
+  vars:
+    consul_datacenter: fabos
+    consul_domain: fabos
+    consul_servers_list: "{{ ['192.168.1.1'] }}"
+    consul_client_force_install: true
+  tasks:
+    - name: include vars
+      ansible.builtin.include_vars:
+        file: "{{ item }}"
+      loop:
+        - ../default-install/vars.yml
+        - test_var.yml
+
+    - name: Include install task file
+      ansible.builtin.include_role:
+        name: consul

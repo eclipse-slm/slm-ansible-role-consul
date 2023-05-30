@@ -1,0 +1,35 @@
+---
+consul_services:
+  - ID: 90549fb6-16de-4dd0-ad56-5b56f7d08892
+    Service: Test-Service-1
+    Tags:
+      - service-1-tag1
+      - service-1-tag2
+      - service-1-tag3
+    Port: 8080
+    Meta:
+      service-1-key1: service-1-value1
+      service-1-key2: service-1-value2
+      service-1-key3: service-1-value3
+  - ID: 79d331c2-fbc9-48a2-b2a0-223f0c795ca3
+    Service: Test-Service-2
+    Tags:
+      - service-2-tag1
+      - service-2-tag2
+      - service-2-tag3
+    Meta:
+      service-2-key1: service-2-value1
+      service-2-key2: service-2-value2
+      service-2-key3: service-2-value3
+
+consul_verify_services:
+  - ID: 8c89718d-998c-4e15-be77-9465b810dcaa
+    Service: Test-Service-3
+    Tags:
+      - service-3-tag1
+      - service-3-tag2
+      - service-3-tag3
+    Meta:
+      service-3-key1: service-3-value1
+      service-3-key2: service-3-value2
+      service-3-key3: service-3-value3
