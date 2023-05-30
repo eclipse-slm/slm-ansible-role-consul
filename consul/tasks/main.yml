@@ -1,8 +1,17 @@
 ---
 # tasks file for consul
-- name: Install consul_client on target host
-  ansible.builtin.include_tasks: install.yml
+- name: Install consul client
   when: state | default("present") == "present"
+  block:
+    - name: Check connection to consul server
+      ansible.builtin.include_tasks: helper/check_server_conn.yml
+
+    - name: Get node infos from server
+      ansible.builtin.include_tasks: helper/get_node_info_from_server.yml
+
+    - name: Install consul_client on target host
+      ansible.builtin.include_tasks: install.yml
+      when: is_server_available or (consul_client_force_install | default(false))
 
 - name: Uninstall consul_client on target host
   ansible.builtin.include_tasks: uninstall.yml
