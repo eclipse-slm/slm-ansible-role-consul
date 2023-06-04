@@ -1,0 +1,13 @@
+- name: GET /catalog/datacenters
+  ansible.builtin.uri:
+    url: "http://{{ consul_servers_list | first }}:8500/v1/catalog/datacenters"
+    method: GET
+  register: get_datacenters
+
+- name: Set datacenter
+  ansible.builtin.set_fact:
+    consul_datacenter: "{{ (get_datacenters.json | first) | default('fabos') }}"
+
+- name: Set domain
+  ansible.builtin.set_fact:
+    consul_domain: "{{ consul_datacenter }}"
