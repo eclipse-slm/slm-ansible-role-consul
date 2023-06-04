@@ -9,8 +9,14 @@
       Name: "{{ service.Service }}"
       Tags: "{{ service.Tags | default([]) }}"
       Address: "{{ ansible_host }}"
-      Meta: "{{ service.Meta | default({}) }}"
       Weights: "{{ service.Weights }}"
+
+- name: Add Meta to body if available
+  ansible.builtin.set_fact:
+    body: "{{ body | combine({ 'Meta': service.Meta }) }}"
+  when:
+    - service.Meta is defined
+    - service.Meta | length > 0
 
 - name: Add Port to body if available
   ansible.builtin.set_fact:
