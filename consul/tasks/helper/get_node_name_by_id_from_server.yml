@@ -1,0 +1,25 @@
+---
+- name: "Get Node info of resource with id '{{ consul_client_node_id }}'"
+  uri:
+    url: "http://{{ consul_servers_list | first }}:8500/v1/catalog/nodes?filter={{ filter_exp }}"
+    method: GET
+    status_code: 200
+    validate_certs: no
+#    headers:
+#      Authorization: "Bearer {{ consul_token }}"
+  vars:
+    filter_exp: "{{ 'ID==\"' + consul_client_node_id + '\"' }}"
+  register: output_get_node
+
+- debug:
+    var: output_get_node.json
+
+- name: Set consul client node name (node not available)
+  ansible.builtin.set_fact:
+    consul_client_node_name: "{{ consul_client_node_id }}"
+  when: output_get_node.json | length == 0
+
+- name: Set consul client node name (node available)
+  ansible.builtin.set_fact:
+    consul_client_node_name: "{{ (output_get_node.json | first).Node }}"
+  when: output_get_node.json | length > 0
