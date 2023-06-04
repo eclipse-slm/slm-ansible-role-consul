@@ -1,0 +1,2 @@
+### Get Catalog Nodes
+GET http://{{host-server}}:{{port-server}}/v1/catalog/datacenters
