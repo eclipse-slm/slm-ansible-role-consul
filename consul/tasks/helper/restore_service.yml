@@ -16,7 +16,7 @@
     body: "{{ body | combine({ 'Meta': service.Meta }) }}"
   when:
     - service.Meta is defined
-    - service.Meta | length > 0
+    - service.Meta | default("") | length > 0
 
 - name: Add Port to body if available
   ansible.builtin.set_fact:
