@@ -16,6 +16,7 @@
     body: "{{ body | combine({ 'Meta': service.Meta }) }}"
   when:
     - service.Meta is defined
+    - service.Meta != None
     - service.Meta | default("") | length > 0
 
 - name: Add Port to body if available
