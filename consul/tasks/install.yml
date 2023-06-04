@@ -2,6 +2,9 @@
 - name: Assert Input params
   ansible.builtin.include_tasks: helper/assert_install_params.yml
 
+- name: Get datacenter/domain from server
+  ansible.builtin.include_tasks: helper/get_datacenter_from_server.yml
+
 - name: Install packages
   ansible.builtin.include_tasks: helper/install_packages.yml
 
