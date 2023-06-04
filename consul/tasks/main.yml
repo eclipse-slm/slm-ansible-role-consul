@@ -6,6 +6,10 @@
     - name: Check connection to consul server
       ansible.builtin.include_tasks: helper/check_server_conn.yml
 
+    - name: Get consul node name by node ID
+      ansible.builtin.include_tasks: helper/get_node_name_by_id_from_server.yml
+      when: consul_client_node_name is not defined
+
     - name: Get node infos from server
       ansible.builtin.include_tasks: helper/get_node_info_from_server.yml
 
