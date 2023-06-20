@@ -3,6 +3,12 @@
 - name: Install consul client
   when: state | default("present") == "present"
   block:
+    - name: Assert Input params
+      ansible.builtin.include_tasks: helper/assert_install_params.yml
+
+    - name: Get datacenter/domain/advertise_ip from server
+      ansible.builtin.include_tasks: helper/get_datacenter_from_server.yml
+
     - name: Check connection to consul server
       ansible.builtin.include_tasks: helper/check_server_conn.yml
 
