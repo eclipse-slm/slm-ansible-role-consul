@@ -2,5 +2,5 @@
 - name: Assert install parameter
   ansible.builtin.assert:
     that:
-      - consul_servers_list is defined and consul_servers_list | length > 0
+      - consul_url is defined and consul_url | length > 0
       - consul_client_node_id is defined and consul_client_node_id | length > 0
