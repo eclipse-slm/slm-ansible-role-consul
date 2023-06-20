@@ -1,2 +1,5 @@
 ### Get Catalog Nodes
 GET http://{{host-server}}:{{port-server}}/v1/catalog/datacenters
+
+### Get Nodes for Service
+GET http://{{host-server}}:{{port-server}}/v1/catalog/service/consul
