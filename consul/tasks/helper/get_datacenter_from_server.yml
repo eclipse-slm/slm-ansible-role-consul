@@ -3,6 +3,8 @@
   ansible.builtin.uri:
     url: "{{ consul_url }}/v1/catalog/datacenters"
     method: GET
+    headers:
+      Authorization: "Bearer {{ consul_token }}"
   register: get_datacenters
 
 - name: Set datacenter
@@ -17,6 +19,8 @@
   ansible.builtin.uri:
     url: "{{ consul_url }}/v1/catalog/service/consul"
     method: GET
+    headers:
+      Authorization: "Bearer {{ consul_token }}"
   register: get_consul_service_nodes
 
 - name: Set Consul Servers List
