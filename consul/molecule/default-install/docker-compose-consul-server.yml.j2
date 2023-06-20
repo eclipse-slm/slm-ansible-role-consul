@@ -8,4 +8,4 @@ services:
        - "8300:8300"
        - "8301:8301"
       environment:
-        CONSUL_LOCAL_CONFIG: '{"datacenter": "fabos", "domain": ".fabos", "advertise_addr": "{{ consul_server_address }}", "bind_addr": "0.0.0.0", "retry_join": ["0.0.0.0"], "acl":{"enabled": true, "default_policy": "allow", "tokens":{"master": "myroot"}}}'
+        CONSUL_LOCAL_CONFIG: '{"datacenter": "fabos", "domain": ".fabos", "advertise_addr": "{{ consul_server_address }}", "bind_addr": "0.0.0.0", "retry_join": ["0.0.0.0"], "acl":{"enabled": true, "default_policy": "deny", "tokens":{"master": "myroot"}}}'
