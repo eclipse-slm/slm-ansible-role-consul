@@ -33,7 +33,7 @@
     var: true in ( wait_for_port | json_query('results[*].failed') )
 
 - debug:
-    var: (true in ( wait_for_port | json_query('results[*].failed') )) == false
+    var: (true in ( wait_for_port | json_query('results[*].failed') )) | bool == false
 
 # If one wait_for fails => connectivity to server is not possible
 - name: Save result of availability
