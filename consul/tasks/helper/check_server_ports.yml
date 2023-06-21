@@ -25,9 +25,9 @@
     loop_var: port
   register: wait_for_port
 
-- name: Print wait_for_port result
+- name: Print wait_for_port.results.failed result
   debug:
-    var: wait_for_port
+    var: wait_for_port | json_query('results[*].failed')
 
 # If one wait_for fails => connectivity to server is not possible
 - name: Save result of availability
