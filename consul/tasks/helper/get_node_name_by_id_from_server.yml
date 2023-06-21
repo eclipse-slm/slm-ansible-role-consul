@@ -5,8 +5,8 @@
     method: GET
     status_code: 200
     validate_certs: no
-#    headers:
-#      Authorization: "Bearer {{ consul_token }}"
+    headers:
+      Authorization: "Bearer {{ consul_token }}"
   vars:
     filter_exp: "{{ 'ID==\"' + consul_client_node_id + '\"' }}"
   register: output_get_node
