@@ -29,16 +29,10 @@
   debug:
     var: wait_for_port | json_query('results[*].failed')
 
-- debug:
-    var: true in ( wait_for_port | json_query('results[*].failed') )
-
-- debug:
-    var: (true in ( wait_for_port | json_query('results[*].failed') )) | bool == false
-
 # If one wait_for fails => connectivity to server is not possible
 - name: Save result of availability
   ansible.builtin.set_fact:
-    availability: "{{ (true in ( wait_for_port | json_query('results[*].failed') )) == false }}"
+    availability: "{{ (true in ( wait_for_port | json_query('results[*].failed') )) | bool == false }}"
 
 # server_availability: key = server_ip, value = availability of server
 - name: Add result to server availability
