@@ -9,22 +9,25 @@
     - name: Get datacenter/domain/advertise_ip from server
       ansible.builtin.include_tasks: helper/get_datacenter_from_server.yml
 
-    - name: Check connection to consul server
-      ansible.builtin.include_tasks: helper/check_server_conn.yml
-
-    - name: Get node-infos and install consul agent on target
-      when: is_server_available
+    - name: Go on
+      when: is_advertised_server_addr_available
       block:
-        - name: Get consul node name by node ID
-          ansible.builtin.include_tasks: helper/get_node_name_by_id_from_server.yml
-          when: consul_client_node_name is not defined
+      - name: Check connection to consul server
+        ansible.builtin.include_tasks: helper/check_server_conn.yml
 
-        - name: Get node infos from server
-          ansible.builtin.include_tasks: helper/get_node_info_from_server.yml
+      - name: Get node-infos and install consul agent on target
+        when: is_server_available
+        block:
+          - name: Get consul node name by node ID
+            ansible.builtin.include_tasks: helper/get_node_name_by_id_from_server.yml
+            when: consul_client_node_name is not defined
 
-        - name: Install consul_client on target host
-          ansible.builtin.include_tasks: install.yml
-          when: is_server_available or (consul_client_force_install | default(false))
+          - name: Get node infos from server
+            ansible.builtin.include_tasks: helper/get_node_info_from_server.yml
+
+          - name: Install consul_client on target host
+            ansible.builtin.include_tasks: install.yml
+            when: is_server_available or (consul_client_force_install | default(false))
 
 - name: Uninstall consul_client on target host
   ansible.builtin.include_tasks: uninstall.yml

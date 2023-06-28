@@ -6,23 +6,31 @@
     headers:
       Authorization: "Bearer {{ consul_token }}"
   register: get_datacenters
+  ignore_errors: true
 
-- name: Set datacenter
+- name: Set is_advertised_addr_available
   ansible.builtin.set_fact:
-    consul_datacenter: "{{ (get_datacenters.json | first) | default('fabos') }}"
+    is_advertised_server_addr_available: get_datacenters.failed == false
 
-- name: Set domain
-  ansible.builtin.set_fact:
-    consul_domain: "{{ consul_datacenter }}"
+- name: Get other information from server
+  when: is_advertised_server_addr_available
+  block:
+  - name: Set datacenter
+    ansible.builtin.set_fact:
+      consul_datacenter: "{{ (get_datacenters.json | first) | default('fabos') }}"
 
-- name: GET /catalog/service/consul
-  ansible.builtin.uri:
-    url: "{{ consul_url }}/v1/catalog/service/consul"
-    method: GET
-    headers:
-      Authorization: "Bearer {{ consul_token }}"
-  register: get_consul_service_nodes
+  - name: Set domain
+    ansible.builtin.set_fact:
+      consul_domain: "{{ consul_datacenter }}"
 
-- name: Set Consul Servers List
-  ansible.builtin.set_fact:
-    consul_servers_list: "{{ get_consul_service_nodes.json | map(attribute='Address') | default([]) }}"
+  - name: GET /catalog/service/consul
+    ansible.builtin.uri:
+      url: "{{ consul_url }}/v1/catalog/service/consul"
+      method: GET
+      headers:
+        Authorization: "Bearer {{ consul_token }}"
+    register: get_consul_service_nodes
+
+  - name: Set Consul Servers List
+    ansible.builtin.set_fact:
+      consul_servers_list: "{{ get_consul_service_nodes.json | map(attribute='Address') | default([]) }}"
