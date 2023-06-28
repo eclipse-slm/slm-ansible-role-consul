@@ -5,6 +5,7 @@
     method: GET
     headers:
       Authorization: "Bearer {{ consul_token }}"
+    timeout: 5
   register: get_datacenters
   ignore_errors: true
 
