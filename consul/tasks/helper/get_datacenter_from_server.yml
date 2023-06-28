@@ -10,7 +10,7 @@
 
 - name: Set is_advertised_addr_available
   ansible.builtin.set_fact:
-    is_advertised_server_addr_available: get_datacenters.failed == false
+    is_advertised_server_addr_available: "{{ get_datacenters.failed == false }}"
 
 - name: Get other information from server
   when: is_advertised_server_addr_available
